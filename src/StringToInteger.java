@@ -13,7 +13,6 @@ public class StringToInteger {
 		Matcher matcher =  pattern.matcher(str);
 		if (matcher.find()) {
 			String num = matcher.group(1);
-			System.out.println(num);
 			String[] characters = num.split("");
 			if (characters[0].equals("-")){
 				flag = true;
