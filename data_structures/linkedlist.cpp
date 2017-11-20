@@ -49,27 +49,27 @@ class List
             delete tail;
         }
         void print();
-        bool Insert(Data da, int position);
-        bool Delete(int position, Data &da);
-        bool Change(Data da, int position);
+        bool insert(Data da, int position);
+        bool remove(int position, Data &da);
+        bool change(Data da, int position);
+        void reserve();
+        int size();
 };
 
 //在第position个元素前插入da
-bool List::Insert(Data da, int position)
+bool List::insert(Data da, int position)
 {
-    cout<<"in"<<endl;
     if(this->length == 0)
     {
-        cout<<"head=null"<<endl;
         Node *node = new Node(da);
         head->next = node;
         this->length++;
-        return 1;
+        return ok;
     }
     //插入位置超出范围
     if(position < 1 || position > this->length){
         cout<<"位置超出范围"<<endl;
-        return 0;
+        return error;
     }
 
     Node *p = head;
@@ -81,15 +81,15 @@ bool List::Insert(Data da, int position)
         j++;
     }
     if(j!=position-1)
-        return 0;
+        return error;
     Node *node = new Node(da, p->next);
     p->next = node;
     this->length++;
-    return 1;
+    return ok;
 }
 
 // 替换第position处的数据
-bool List::Change(Data da, int position)
+bool List::change(Data da, int position)
 {
     if(position < 1 || position > length)
         return error;
@@ -107,7 +107,8 @@ bool List::Change(Data da, int position)
     return ok;
 }
 
-bool List::Delete(int position, Data &da)
+//替换某个节点值
+bool List::remove(int position, Data &da)
 {
     if(position < 1 || position > this->length)
         return error;
@@ -127,6 +128,28 @@ bool List::Delete(int position, Data &da)
     return ok;
 }
 
+//链表逆序
+void List::reserve()
+{
+    Node *top, *p, *j;
+    top = NULL;
+    p = head->next;
+    while(p != NULL)
+    {
+        j = p->next;
+        p->next = top;
+        top = p;
+        p = j;
+    }
+    head->next = top;
+}
+
+//获取链表节点个数
+int List::size()
+{
+    return this->length;
+}
+
 void List::print()
 {
     Node *p = this->head;
@@ -144,20 +167,19 @@ int main()
     List list;
     Data da(1);
     Data da2(2);
-    list.Insert(da, 1);
+    list.insert(da, 1);
     list.print();
-    list.Insert(da2, 1);
+    list.insert(da2, 1);
     list.print();
-    list.Insert(da2,1);
-    list.Insert(da2,1);
-    list.Insert(da,1);
+    list.insert(da2,1);
+    list.insert(da2,1);
+    list.insert(da,1);
     list.print();
     Data da3(3);
-    list.Change(da3, 3);
+    list.change(da3, 1);
     list.print();
-
-    list.Delete(1, da);
-    cout<<da.data<<endl;
+    list.reserve();
     list.print();
+    cout<<list.size()<<endl;
     return 0;
 }
