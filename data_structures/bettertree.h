@@ -23,6 +23,7 @@ public:
     void print();
     void print2(T *node, int i);
     int depth();
+    int dfs(T *tnode);
     // void tobinarytree();
     // void createhuffumentree();
 };
@@ -130,8 +131,29 @@ bool Tree<T, L>::remove(T *parentNode, int position)
 template <typename T, typename L>
 int Tree<T, L>::depth()
 {
-
+    return this->dfs(this->root);
     
+}
+
+template <typename T, typename L>
+int Tree<T, L>::dfs(T *node)
+{
+    std::cout<<node->data<<"   "<<node->length<<std::endl;
+    int sum=0, a=0;
+    if(node->length > 0)
+    {
+        List<L> *list = node->root;
+        for(int i=1; i<=node->length; i++)
+        {
+            a = dfs(list->get(i)->child) + 1;
+            sum = a>sum ? a: sum;
+        }
+        return sum;
+    }
+    else
+    {
+        return 1;
+    }
 }
 
 template <typename T, typename L>
