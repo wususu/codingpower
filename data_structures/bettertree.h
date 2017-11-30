@@ -1,7 +1,9 @@
 // 树工具类
 #include "linkedlist.h"
 #include <iostream>
- 
+
+namespace NT{
+
 template <typename T, typename L>
 class Tree
 {
@@ -20,12 +22,11 @@ public:
     bool insert(T *treeNode, T *parent);
     bool contains(T *treenode, T *parentNode);
     bool remove(T *parentNode, int position);
-    void print();
-    void print2(T *node, int i);
+    bool change(T *node, T *parentNode, int position);
     int depth();
     int dfs(T *tnode);
-    // void tobinarytree();
-    // void createhuffumentree();
+    void print();
+    void print2(T *node, int i);
 };
 
 template<typename T>
@@ -39,7 +40,16 @@ public:
     {
         this->child = NULL;
         this->next = NULL;
-        // this->myTreeNode = myTreeNode;
+    }
+    ListNode(T *child)
+    {
+        this->child = child;
+        this->next = NULL;
+    }
+    ListNode(T *child, ListNode *next)
+    {
+        this->child = child;
+        this->next = next;
     }
 };
 
@@ -70,17 +80,30 @@ public:
         listNode->child = childNode;
         childNode->parent = this;
         this->root->insert(listNode, -1);
-        this->length++;
+        this->length = this->root->size();
+        std::cout<<"length: "<<this->length<<std::endl;
         return 1;
     }
+
     // 移除第position(1~n)个子树
     bool removeChildNode(int position)
     {
         if(position < 1 || position > this->length)
             return 0;
+        
         ListNode<TreeNode> *listNode = NULL;
-        this->length--;
+        this->length = this->root->size();
         return this->root->remove(listNode, position);
+    }
+
+    // 替换第position(1~n)个子树
+    bool changeChildNode(TreeNode *treeNode, int position)
+    {
+        if(position < 1 || position > this->length)
+            return 0;
+        
+        ListNode<TreeNode> *listNode = new ListNode<TreeNode>(treeNode);
+        return this->root->change(listNode, position);
     }
 };
 
@@ -120,6 +143,12 @@ bool Tree<T, L>::insert(T *node, T *parentNode)
         return ok;
     }
     return error;
+}
+
+template <typename T, typename L>
+bool Tree<T, L>::change(T *node, T *parentNode, int position)
+{
+    return parentNode->changeChildNode(node, position);
 }
 
 template <typename T, typename L>
@@ -179,10 +208,12 @@ void Tree<T, L>::print2(T *node,int i)
         }
         std::cout<<std::endl;
 
-        for(int j=1; j<= node->length ;j++)
+        for(int j=1; j<= node->length; j++)
         {
-            T * tnode = node->root->get(i)->child;
+            T * tnode = node->root->get(j)->child;
             print2(tnode, i+1);
         }
     } 
+}
+
 }
