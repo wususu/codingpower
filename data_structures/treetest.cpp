@@ -43,7 +43,7 @@ int main()
     tree->insert(tnode6, tnode5);
 
     tree->insert(tnode7, tnode2);
-            tree->insert(tnode13, tnode3);
+    tree->insert(tnode13, tnode3);
 
     tree->insert(tnode8, tnode7);
     tree->insert(tnode9, tnode8);
@@ -61,6 +61,13 @@ int main()
     BT::BinaryTree *binaryTree = new BT::BinaryTree();
 
     BT::BinaryTree *binaryTree2 = binaryTree->toBinaryTree(tree);
+
+    std::cout<<"前序遍历二叉树"<<std::endl;
     binaryTree->firstRootReserve(binaryTree2->root);
+    
+    std::cout<<"哈弗曼树构建及其遍历"<<std::endl;
+    binaryTree->printHaffumanTree(binaryTree2->toHaffumanTree());
+    
+
     return 0;
 }
