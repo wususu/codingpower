@@ -1,37 +1,67 @@
 #include <iostream>
+#include <string>
 #include "graph.h"
 
 int main()
 {
-    gv::Graph<int, int> *graph = new gv::Graph<int ,int>();
+    gv::Graph<int, std::string> *graph = new gv::Graph<int ,std::string>();
         std::cout<<"in1"<<std::endl;
 
-    int a= graph->insert(3);
+    int a= graph->insert("A");
 
-    int b = graph->insert(4);
+    int b = graph->insert("B");
 
-    int c = graph->insert(11);
+    int c = graph->insert("C");
 
-    graph->change(c, 12);
+    int d = graph->insert("D");
 
-    graph->addArc(a, b, 10);
+    int e = graph->insert("E");
 
-    graph->addArc(a, c, 11);
+    int f = graph->insert("F");
+
+    int g = graph->insert("G");
+
+    int h = graph->insert("H");
 
 
-    graph->addArc(b,c, 1);
+    graph->addArc(a, b, 1);
 
-    graph->addArc(c, a, 3);
+    graph->addArc(a, c, 2);
+
+    graph->addArc(b, e, 5);
+
+    graph->addArc(b,d, 4);
+
+    graph->addArc(c, e, 3);
+
+    graph->addArc(c, f, 5);
+
+    graph->addArc(d, g, 9);
+
+    graph->addArc(e, g, 7);
+
+    graph->addArc(e, h, 10);
+
+    graph->addArc(f, h, 3);
+
+
+
+ graph->addArc(e, f, 1);
 
 
     graph->printVroots();
 
 
-    graph->removeArc(1,3);
-    graph->remove(b);
+    // graph->removeArc(1,3);
+    // graph->remove(b);
 
 
     std::cout<<"------"<<std::endl;
+        graph->remove(e);
+
     graph->printVroots();
+        std::cout<<"------"<<std::endl;
+    graph->get_shortest_route(a, h);
+    
     return 0;
 }

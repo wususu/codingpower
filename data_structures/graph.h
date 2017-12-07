@@ -1,4 +1,6 @@
 #include <iostream>
+#include <climits>
+#define INFINITY 65535
 
 namespace gv
 {
@@ -9,38 +11,38 @@ namespace gv
 template <typename T, typename K>
 class Vertex
 {
-private:
-    // 权重
-    T weight;
-    //　点值
-    K name;
-    // 头顶点编号
-    int number;
-    // 下一个相连的头顶点编号
-    Vertex<T, K> *next = NULL;
-public:
-    enum{
-        error = 0,
-        ok = 1
-    };
+    private:
+        // 权重
+        T weight;
+        //　点值
+        K name;
+        // 头顶点编号
+        int number;
+        // 下一个相连的头顶点编号
+        Vertex<T, K> *next = NULL;
+    public:
+        enum{
+            error = 0,
+            ok = 1
+        };
 
-    Vertex(int number, K name):Vertex(number,name, NULL, NULL){};
+        Vertex(int number, K name):Vertex(number,name, NULL, NULL){};
 
-    Vertex(int number, K name, T weight):Vertex(number, name, weight, NULL){};
+        Vertex(int number, K name, T weight):Vertex(number, name, weight, NULL){};
 
-    Vertex(int number,K name, T weight, Vertex<T, K>* next);
+        Vertex(int number,K name, T weight, Vertex<T, K>* next);
 
-    void setW(int weight);
+        void setW(int weight);
 
-    Vertex<T, K>* getNext();
+        Vertex<T, K>* getNext();
 
-    K getName();
+        K getName();
 
-    T getW();
+        T getW();
 
-    int getN();
+        int getN();
 
-    void setNext(Vertex<T, K> *next);
+        void setNext(Vertex<T, K> *next);
 };
 
 /**
@@ -49,54 +51,53 @@ public:
 template<typename T, typename K>
 class Vroot
 {
-private:
+    private:
     
-    // 顶点(即尾顶点)编号
-    int number;
-    // 该点的信息;
-    K name;
-    // 该顶点的连线数;
-    int arcN = 0;
-    // 链表头
-    Vertex<T, K> *root;
+        // 顶点(即尾顶点)编号
+        int number;
+        // 该点的信息;
+        K name;
+        // 该顶点的连线数;
+        int arcN = 0;
+        // 链表头
+        Vertex<T, K> *root;
 
-    Vroot<T, K> *next;
+        Vroot<T, K> *next;
 
-public:
+    public:
 
-    enum {error = 0, ok = 1};
+        enum {error = 0, ok = 1};
 
-    Vroot():Vroot(0, NULL, NULL){};
+        Vroot():Vroot(0, NULL, NULL){};
 
-    Vroot(int number, K name):Vroot(number, NULL, name){};
+        Vroot(int number, K name):Vroot(number, NULL, name){};
 
-    Vroot(int number, Vertex<T, K>* root, K name);
+        Vroot(int number, Vertex<T, K>* root, K name);
 
-    ~Vroot();
+        ~Vroot();
 
-    void setName(K name);
+        void setName(K name);
 
-    K getName();
+        K getName();
 
-    void setNext(Vroot *next);
+        void setNext(Vroot *next);
 
-    Vroot<T, K> * getNext();
+        Vroot<T, K> * getNext();
 
-    int getN();
+        int getN();
 
-    void setVertexRoot(Vertex<T, K> *v);
+        void setVertexRoot(Vertex<T, K> *v);
 
-    Vertex<T, K>* getVertexRoot();
+        Vertex<T, K>* getVertexRoot();
 
-    bool addVertex(int head, K name, T weight);
+        bool addVertex(int head, K name, T weight);
 
-    bool contain(int head);
+        bool contain(int head);
 
-    // 移除该顶点指向第head个顶点的弧
-    bool remove(int head);
+        // 移除该顶点指向第head个顶点的弧
+        bool remove(int head);
+
 };
-
-
 
 /**
  * 图
@@ -105,49 +106,55 @@ template <typename T, typename K>
 class Graph
 {
 
-private:
+    private:
+        Vroot<T, K> *vhead;
+        // 当前顶点数
+        int count = 0;
+        // 序号生成
+        int num = 0;
+        
 
-Vroot<T, K> *vhead;
-// 当前顶点数
-int num = 0;
+    public:
+        enum {error = 0, ok = 1};
 
-public:
-    enum {error = 0, ok = 1};
+        Graph();
 
-    Graph();
+        ~Graph();
+        
+        int getN();
+        
+        void incN();
 
-    ~Graph();
-    
-    int getN();
-    
-    void incN();
+        void decN();
+        
+        bool contains(int name);
+        
+        Vroot<T, K>* getVroot(int n);
+        
+        bool addVroot(Vroot<T, K>* vroot);
+        
+        int insert(K name);
+        /**
+         * 移除第num个顶点及所有指向该点的弧
+         **/
+        
+        bool remove(int num);
+        
+        bool change(int num, K name);
+        
+        /**
+         * 给编号为bottom与head的顶点添加一条权重为weight的有向边
+         * */
+        bool addArc(int bottom, int head, T weight);
+        
+        bool removeArc(int bottom, int head);
+        
+        Vroot<T, K>* get_shortest_route(int start_point, int end_point);
 
-    void decN();
-    
-    bool contains(int name);
-    
-    Vroot<T, K>* getVroot(int n);
-    
-    bool addVroot(Vroot<T, K>* vroot);
-    
-    int insert(K name);
-    /**
-     * 移除第num个顶点及所有指向该点的弧
-     **/
-    
-    bool remove(int num);
-    
-    bool change(int num, K name);
-    
-    /**
-     * 给编号为bottom与head的顶点添加一条权重为weight的有向边
-     * */
-    bool addArc(int bottom, int head, T weight);
-    
-    bool removeArc(int bottom, int head);
-    
-    //debug
-    void printVroots();
+        //debug
+        void printVroots();
+                void print(int a[], int n);
+
 };
 
 template <typename T, typename K>
@@ -361,14 +368,15 @@ template <typename T, typename K>
 void Graph<T, K>::incN()
 {
     this->num++;
+    this->count++;
 }
 
 template <typename T, typename K>
 void Graph<T, K>::decN()
 {
-    if(this->num > 0)
+    if(this->count > 0)
     {
-        this->num--;
+        this->count--;
     }
 }
 
@@ -432,28 +440,35 @@ bool Graph<T, K>::remove(int num)
     if(p->getN() == num)
     {
         this->vhead = p->getNext();
+        p->remove(num);
     }
-    p->remove(num);
-    while(q!=NULL)
+    else
     {
-        if(q->getN() == num)
+        while(q!=NULL)
         {
-            this->decN();
-            p->setNext(q->getNext());
-            delete q;
-            q = p->getNext();
-            continue;
-        }
-        q->remove(num);
+            if(q->getN() == num)
+            {
 
-        p = q;
-        q = p->getNext();
+                this->decN();
+                p->setNext(q->getNext());
+                q->remove(num);
+
+                delete q;
+
+                q = p->getNext();
+                break;
+            }
+
+            p = q;
+            q = p->getNext();
+        }
     }
+
     return true;
 }
 
 /**
- * 获取第n(1~n)个顶点 
+ * 获取编号为N的顶点 
  **/
 template <typename T, typename K>
 Vroot<T, K>* Graph<T, K>::getVroot(int n)
@@ -462,12 +477,14 @@ Vroot<T, K>* Graph<T, K>::getVroot(int n)
     {
         int i=1;
         Vroot<T, K> *p = this->vhead;
-        while(i<n && p->getNext()!=NULL)
-       {
-           p = p->getNext();
-           i++;
+        while(p != NULL)
+        {
+            if(p->getN() == n)
+            {
+                return p;
+            }
+            p = p->getNext();
         }
-        return p;
     }
     return NULL;
 }
@@ -508,6 +525,148 @@ bool Graph<T, K>::removeArc(int bottom, int head)
     if(bottom <1 || bottom > this->num || head < 1 || head > this->num)
         return false;
     return this->getVroot(bottom)->remove(head);
+}
+
+template <typename T, typename K>
+Vroot<T, K>* Graph<T, K>::get_shortest_route(int start_point, int end_point)
+{
+    if(start_point < 1 || start_point > this->num || end_point < 1 || start_point > end_point)
+    {
+        return NULL;
+    }
+    int finall[this->num+1], u, s_p[this->num+1];
+    T **weight = new T*[num+1];
+    T min;
+    T *dis = new T[num+1];
+    Vroot<T, K> *p = this->vhead, *q = NULL;
+    Vertex<T, K> *v;
+
+    for(int i=0; i<num+1; i++)
+    {
+        finall[i] = 0; 
+        weight[i] = new T[num+1];
+    }
+    finall[start_point] = 1;
+
+    // 初始化点与点的距离
+     for(int i=0;i<=num;i++)
+    {
+        for(int j=0;j<=num;j++)
+        {
+            if(i == j)
+            {
+                weight[i][j] = 0;
+            }
+            else
+            {
+                weight[i][j] = INFINITY;
+            }
+        }
+    }
+
+    while(p!=NULL)
+    {
+        v = p->getVertexRoot();
+        while(v!=NULL)
+        {
+            weight[p->getN()][v->getN()] = v->getW();
+            v = v->getNext();
+        }
+        p = p->getNext();
+    }
+
+    // 起点到各个点的距离
+    for(int i=0; i<=this->num; i++)
+    {
+        if(weight[1][i] != INFINITY)
+        {
+            s_p[i] = 1;
+        }
+        else
+        {
+            s_p[i] = 0;
+        }
+        dis[i] = weight[1][i];
+    }
+
+    for(int i=1;i<=num;i++)
+    {
+        for(int j=1;j<=num;j++)
+        {
+            std::cout<<weight[i][j]<<" ";
+        }
+        std::cout<<std::endl;
+    }
+    
+    for(int i=0;i<this->count-3; i++)
+    {
+        min = INFINITY;
+        p = this->vhead;
+        while(p!=NULL)
+        {
+            if( !finall[p->getN()] && dis[p->getN()] < min)
+            {
+                u = p->getN();
+                min = dis[u];
+            }
+            p = p->getNext();
+        }
+        finall[u] = 1;
+
+        p = this->vhead;
+        while(p!=NULL)
+        {
+            if(!finall[p->getN()] && dis[u]+weight[u][p->getN()] < dis[p->getN()])
+            {
+                dis[p->getN()] = dis[u] + weight[u][p->getN()];
+                s_p[p->getN()] = u;
+            }
+            p = p->getNext();
+        }
+
+    }
+
+    // std::cout<<"dis[]: ";
+    // for(int i=1;i<this->num+1;i++)
+    // {
+    //     std::cout<<dis[i]<<" ";
+    // }
+    // std::cout<<std::endl;
+
+    //     std::cout<<"s_p[]: ";
+    // for(int i=1;i<this->num+1;i++)
+    // {
+    //     std::cout<<s_p[i]<<" ";
+    // }
+    // std::cout<<std::endl;
+
+    //输出
+    if(s_p[end_point] == 0)
+    {
+        std::cout<<start_point<<"号顶点到"<<end_point<<"号顶点无可达路径"<<std::endl;
+    }
+    else
+    {
+        std::cout<<start_point<<"号顶点到"<<end_point<<"的最短路径是:"<<std::endl;
+        this->print(s_p, end_point);
+        std::cout<<"路径费用为"<<dis[end_point]<<std::endl;
+    }
+
+    return NULL;
+}
+
+
+/**
+ * 输出最短路径
+ **/ 
+template<typename T, typename K>
+void Graph<T, K>::print(int a[], int n)
+{
+    if(n!=1)
+    {
+        print(a, a[n]);
+    }
+    std::cout<<n<<"("<<this->getVroot(n)->getName()<<")"<<" ";
 }
 
 template <typename T, typename K>
