@@ -149,11 +149,14 @@ class Graph
         
         bool removeArc(int bottom, int head);
         
-        Vroot<T, K>* get_shortest_route(int start_point, int end_point);
+        void get_shortest_route(int start_point, int end_point);
+        
+        void print_shortest_route(int a[], int n);
+
+        void get_key_route();
 
         //debug
         void printVroots();
-                void print(int a[], int n);
 
 };
 
@@ -201,8 +204,6 @@ void Vertex<T, K>::setNext(Vertex<T, K> *next)
 {
     this->next = next;
 }
-
-
 
 template<typename T, typename K>
 Vroot<T, K>::Vroot(int number, Vertex<T, K>* root, K name)
@@ -437,10 +438,10 @@ bool Graph<T, K>::remove(int num)
     }
     Vroot<T, K> *p = this->vhead;
     Vroot<T, K> *q = p->getNext();
+    p->remove(num);
     if(p->getN() == num)
     {
         this->vhead = p->getNext();
-        p->remove(num);
     }
     else
     {
@@ -452,13 +453,12 @@ bool Graph<T, K>::remove(int num)
                 this->decN();
                 p->setNext(q->getNext());
                 q->remove(num);
-
                 delete q;
 
                 q = p->getNext();
                 break;
             }
-
+            q->remove(num);
             p = q;
             q = p->getNext();
         }
@@ -528,11 +528,11 @@ bool Graph<T, K>::removeArc(int bottom, int head)
 }
 
 template <typename T, typename K>
-Vroot<T, K>* Graph<T, K>::get_shortest_route(int start_point, int end_point)
+void Graph<T, K>::get_shortest_route(int start_point, int end_point)
 {
     if(start_point < 1 || start_point > this->num || end_point < 1 || start_point > end_point)
     {
-        return NULL;
+        return ;
     }
     int finall[this->num+1], u, s_p[this->num+1];
     T **weight = new T*[num+1];
@@ -588,15 +588,6 @@ Vroot<T, K>* Graph<T, K>::get_shortest_route(int start_point, int end_point)
         }
         dis[i] = weight[1][i];
     }
-
-    for(int i=1;i<=num;i++)
-    {
-        for(int j=1;j<=num;j++)
-        {
-            std::cout<<weight[i][j]<<" ";
-        }
-        std::cout<<std::endl;
-    }
     
     for(int i=0;i<this->count-3; i++)
     {
@@ -623,22 +614,7 @@ Vroot<T, K>* Graph<T, K>::get_shortest_route(int start_point, int end_point)
             }
             p = p->getNext();
         }
-
     }
-
-    // std::cout<<"dis[]: ";
-    // for(int i=1;i<this->num+1;i++)
-    // {
-    //     std::cout<<dis[i]<<" ";
-    // }
-    // std::cout<<std::endl;
-
-    //     std::cout<<"s_p[]: ";
-    // for(int i=1;i<this->num+1;i++)
-    // {
-    //     std::cout<<s_p[i]<<" ";
-    // }
-    // std::cout<<std::endl;
 
     //输出
     if(s_p[end_point] == 0)
@@ -648,11 +624,11 @@ Vroot<T, K>* Graph<T, K>::get_shortest_route(int start_point, int end_point)
     else
     {
         std::cout<<start_point<<"号顶点到"<<end_point<<"的最短路径是:"<<std::endl;
-        this->print(s_p, end_point);
-        std::cout<<"路径费用为"<<dis[end_point]<<std::endl;
+        this->print_shortest_route(s_p, end_point);
+        std::cout<<"finish 路径费用为"<<dis[end_point]<<std::endl;
     }
 
-    return NULL;
+    return ;
 }
 
 
@@ -660,13 +636,142 @@ Vroot<T, K>* Graph<T, K>::get_shortest_route(int start_point, int end_point)
  * 输出最短路径
  **/ 
 template<typename T, typename K>
-void Graph<T, K>::print(int a[], int n)
+void Graph<T, K>::print_shortest_route(int a[], int n)
 {
     if(n!=1)
     {
-        print(a, a[n]);
+        print_shortest_route(a, a[n]);
     }
-    std::cout<<n<<"("<<this->getVroot(n)->getName()<<")"<<" ";
+    std::cout<<"["<<n<<"]"<<this->getVroot(n)->getName()<<"——>";
+}
+
+
+template <typename T, typename K>
+void Graph<T, K>::get_key_route()
+{
+    int in[this->num+1] = {0};//所有顶点的入度
+    int top[this->num +1] = {0};//存放入度为0的顶点
+    int topu[this->num+1]; //拓扑排序的节点序列
+    T etv[this->num+1] = {0}, ltv[this->num+1]; //时间最早开始时间和最晚开始时间
+    int j = 0, count=0, k=0;
+    Vroot<T, K> *p = NULL;
+    Vertex<T, K> *v = NULL;
+    //拓扑
+    //获取所有顶点的入度
+    p = this->vhead;
+    while(p != NULL)
+    {
+        v = p->getVertexRoot();
+        while(v != NULL)
+        {
+            in[v->getN()]++;
+            v = v->getNext();
+        }
+        p = p->getNext();
+    }
+
+    for(int i=1; i<=this->num; i++)
+    {
+        if(in[i] == 0 && this->contains(i))
+        {
+            top[++j] = i;
+        }
+    }
+
+    // 拓扑排序,计算最早开始时间
+    while(j)
+    {
+        int index = top[j];
+        j--;
+        count++;
+
+        p = this->getVroot(index);
+        v = p->getVertexRoot();
+        topu[++k] = p->getN();
+
+        while(v!=NULL)
+        {
+            int n_in = --in[v->getN()];
+            if(n_in == 0)
+            {
+                top[++j] = v->getN();
+            }
+
+            // 生成最早开始时间
+            if(etv[index] + v->getW() > etv[v->getN()])
+            {
+                etv[v->getN()] = etv[index] + v->getW();
+            }
+            v = v->getNext();
+        }
+    }
+    // 存在环,方法终止
+    if(count < this->count)
+    {
+        std::cout<<"存在环"<<std::endl;
+        return ;
+    }
+
+    //找到最后一个任务的最早开始时间(与最晚开始时间相同)
+    int max = 0;
+    for(int i=1; i<=this->num; i++)
+    {
+        if(etv[i] > max)
+        {
+            max = etv[i];
+        }
+    }
+    //初始化最晚开始时间数组
+    for(int i=1; i<=this->num; i++)
+    {
+        if(this->contains(i))
+        {
+            ltv[i] = max;
+        }
+        else
+        {
+            ltv[i] = 0;
+        }
+    }
+
+    //计算最晚开始时间
+    while(count)
+    {
+        int index = topu[count--];
+        p = this->getVroot(index);
+        v = p->getVertexRoot();
+        while(v != NULL)
+        {
+            if(ltv[v->getN()] - v->getW() < ltv[index])
+            {
+                ltv[index] = ltv[v->getN()] - v->getW();
+            }
+            v = v->getNext();
+        }
+    }
+
+    int x=0, ete, lte;
+    int key_route[this->num+1]={0};
+
+    std::cout<<"关键路径: "<<std::endl;
+    p = this->vhead;
+    while(p != NULL)
+    {
+        v = p->getVertexRoot();
+        while(v != NULL)
+        {
+            ete = etv[p->getN()];
+            lte = ltv[v->getN()] - v->getW();
+            if(ete == lte)
+            {
+                std::cout<<p->getName()<<"(["<<p->getN()<<"] —— "<<v->getName()<<"["<<v->getN()<<"])——>";
+            }
+            v = v->getNext();
+        }
+        p = p->getNext();
+    }
+    std::cout<<"finish"<<std::endl;
+    return ;
 }
 
 template <typename T, typename K>
