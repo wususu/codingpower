@@ -134,9 +134,6 @@ class Graph
         bool addVroot(Vroot<T, K>* vroot);
         
         int insert(K name);
-        /**
-         * 移除第num个顶点及所有指向该点的弧
-         **/
         
         bool remove(int num);
         
@@ -147,12 +144,24 @@ class Graph
          * */
         bool addArc(int bottom, int head, T weight);
         
+        /**
+         * 移除bottom——>head的弧
+         **/
         bool removeArc(int bottom, int head);
         
+        /**
+         * 计算并输出最短路径
+         **/
         void get_shortest_route(int start_point, int end_point);
         
+        /**
+         * 打印最短路径
+         **/
         void print_shortest_route(int a[], int n);
 
+        /**
+         * 计算并输出关键路径
+         **/
         void get_key_route();
 
         //debug
