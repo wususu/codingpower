@@ -437,6 +437,7 @@ bool Graph<T, K>::change(int number, K name)
 template <typename T, typename K>
 bool Graph<T, K>::remove(int num)
 {
+    Vroot<T, K> *p, *q;
     if(num<1 || num>this->num)
     {
         return error;
@@ -445,8 +446,8 @@ bool Graph<T, K>::remove(int num)
     {
         return error;
     }
-    Vroot<T, K> *p = this->vhead;
-    Vroot<T, K> *q = p->getNext();
+    p = this->vhead;
+    q = p->getNext();
     p->remove(num);
     if(p->getN() == num)
     {
@@ -472,7 +473,7 @@ bool Graph<T, K>::remove(int num)
             q = p->getNext();
         }
     }
-
+    p = q = NULL;
     return true;
 }
 
@@ -482,10 +483,11 @@ bool Graph<T, K>::remove(int num)
 template <typename T, typename K>
 Vroot<T, K>* Graph<T, K>::getVroot(int n)
 {
+    Vroot<T, K> *p;
     if(n>0 && n<=this->num)
     {
         int i=1;
-        Vroot<T, K> *p = this->vhead;
+        p = this->vhead;
         while(p != NULL)
         {
             if(p->getN() == n)
@@ -495,6 +497,7 @@ Vroot<T, K>* Graph<T, K>::getVroot(int n)
             p = p->getNext();
         }
     }
+    p = NULL;
     return NULL;
 }
 
@@ -513,19 +516,23 @@ bool Graph<T, K>::addVroot(Vroot<T, K> *vroot)
         p = p->getNext();
     }
     p->setNext(vroot);
+    p = NULL;
     return true;
 }
 
 template <typename T, typename K>
 bool Graph<T, K>::addArc(int bottom, int head, T weight)
 {
+    bool is_success;
     if(bottom < 1 || bottom > this->num || head < 1 || head > this->num)
     {
         return error;
     }
     Vroot<T, K>* vRoot_b = this->getVroot(bottom);
     Vroot<T, K>* vRoot_h = this->getVroot(head);
-    return vRoot_b->addVertex(head, vRoot_h->getName(), weight);
+    is_success = vRoot_b->addVertex(head, vRoot_h->getName(), weight);
+    vRoot_h = vRoot_b = NULL;
+    return is_success;
 }
 
 template <typename T, typename K>
@@ -546,7 +553,7 @@ void Graph<T, K>::get_shortest_route(int start_point, int end_point)
     int finall[this->num+1], u, s_p[this->num+1];
     T **weight = new T*[num+1];
     T min;
-    T *dis = new T[num+1];
+    T dis[num+1];
     Vroot<T, K> *p = this->vhead, *q = NULL;
     Vertex<T, K> *v;
 
@@ -780,17 +787,20 @@ void Graph<T, K>::get_key_route()
         p = p->getNext();
     }
     std::cout<<"finish"<<std::endl;
+    p = NULL;
+    v = NULL;
     return ;
 }
 
 template <typename T, typename K>
 void Graph<T, K>::printVroots()
 {
+    Vertex<T, K> *v;
     Vroot<T, K> *p = this->vhead;
     while(p != NULL)
     {
         std::cout<<"点：　"<<p->getN()<<" :"<<p->getName()<<std::endl;
-        Vertex<T, K> *v = p->getVertexRoot();
+        v = p->getVertexRoot();
         while(v!=NULL)
         {
             std::cout<<p->getN()<<"("<<p->getName()<<")->"<<v->getN()<<"("<<v->getName()<<") 权值："<<v->getW()<<std::endl;
@@ -798,5 +808,7 @@ void Graph<T, K>::printVroots()
         }
         p = p->getNext();
     }
+    p = NULL;
+    v = NULL;
 }
 }
