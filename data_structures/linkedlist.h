@@ -1,93 +1,168 @@
 #include <iostream>
 #include <string>
 
+namespace ll{
+
+template <typename T>
+class Node
+{
+
+private:
+        T data;
+        Node *next;
+
+    public:
+        Node()
+        {
+            this->next = NULL;
+        }
+
+        Node(T da)
+        {
+            this->data = da;
+            this->next = NULL;
+        }
+
+        ~Node()
+        {
+            this->next = NULL;
+        }
+
+        void setData(T da)
+        {
+            this->data = da;
+        }
+
+        T getData()
+        {
+            return this->data;
+        }
+
+        void setNext(Node *next)
+        {
+            this->next = next;
+        }
+
+        Node<T>* getNext()
+        {
+            return this->next;
+        }
+};
+
+
 template <typename T>
 class List
 {
     private:
-        T *head,*tail;
+        Node<T>* head;
+        
         int length;
 
     public:
         enum {error = 0, ok = 1};
-        List()
-        {
-            length = 0;
-            head = new T();
-            tail = NULL;
-        }
-        ~List()
-        {
-            delete head;
-            delete tail;
-        }
+        
+        List();
+
+        ~List();
+        
         void print();
         void print_tree();
-        T* pop();
-        T* get(int position);
-        bool insert(T *node, int position);
-        bool remove(T *node, int position);
-        bool change(T *node, int position);
-        bool contains(T *node);
+        
+        T pop();
+        
+        T get(int position);
+        
+        bool insert(T data, int position = -1);
+        
+        bool remove(int position);
+        
+        bool change(T data, int position);
+        
+        bool contains(T data);
+        
         void reserve();
+        
         int size();
-};
+    };
     
+template <typename T>
+List<T>::List()
+{
+    this->length = 0;
+    this->head = NULL;
+    // head = new Node<T>;
+}
+
+template <typename T>
+List<T>::~List()
+{
+    delete head;
+}
 
 template<typename T>
-T* List<T>::get(int position)
+T List<T>::get(int position)
 {
+    if(this->length<1)
+    {
+        return NULL;
+    }
     if(position < 1)
         position = 1;
     if(position > this->length)
         position = this->length;
-    T *p = head;
-    int j = 0;
-    while(j<position && p->next != NULL)
+
+    Node<T> *p = this->head;
+    int j = 1;
+    while(j<position && p != NULL)
     {
-        p = p->next;
         j++;
+        p = p->getNext();
     }
-    return p;
+    return p->getData();
 }
 
 template<typename T>
-T* List<T>::pop()
+T List<T>::pop()
 {
-    if(this->head == NULL)
+    T a;
+    if(this->length > 0)
     {
-        return NULL;
+        Node<T> *p = head;
+        head = head->getNext();
+        this->length--;
+        a = p->getData();
+        delete p;
     }
-    T *p = head->next;
-    head = head->next;
-    this->length--;
-    return p;
+    return a;
 }
 
 //在第position个元素前插入da
 template <typename T>
-bool List<T>::insert(T *node, int position)
+bool List<T>::insert(T data, int position)
 {
+    Node<T> *p = new Node<T>(data);
+    Node<T> *v = NULL;
+    // 直接放入head
     if(this->length == 0)
     {
-        node->next = this->head->next;
-
-        this->head->next = node;
+        this->head = p;
         this->length++;
 
+        p = NULL;
         return ok;
     }
 
+    // position为-1,插入末尾
     if(position == -1)
     {
-        T *p = this->head;
-        while(p->next != NULL)
+        v = this->head;
+        while(v->getNext() != NULL)
         {
-            p = p->next;
+            v = v->getNext();
         }
-        p->next = node;
-        node->next = NULL;
+        v->setNext(p);
         this->length++;
+        p = v = NULL;
         return ok;
     }
 
@@ -97,62 +172,82 @@ bool List<T>::insert(T *node, int position)
         return error;
     }
 
-    T *p = head;
-
-    int j = 0;
-    while(j<position-1 && p->next != NULL)
+    // 按位置插入
+    v= this->head;
+    if(position == 1)
     {
-        p = p->next;
-        j++;
+        p->setNext(this->head);
+        this->head = p;
     }
-    if(j!=position-1)
-        return error;
-    node->next = p->next;
-    p->next = node;
+    else
+    {
+        int j = 1;
+        while(j<position-1 && v != NULL)
+        {
+            v = v->getNext();
+            j++;
+        }
+        if(j!=position-1)
+            return error;
+        p->setNext(v->getNext());
+        v->setNext(p);
+    }
+
     this->length++;
+    p = v = NULL;
     return ok;
 }
 
 // 替换第position处的数据
 template <typename T>
-bool List<T>::change(T *node, int position)
+bool List<T>::change(T data, int position)
 {
-    if(position < 1 || position > length)
+    if(position < 1 || position > this->length)
         return error;
-    T *p = head,*q = NULL;
-    int j = 0;
-    while(j < position && p->next != NULL)
+    Node<T> *p = head;
+    int j = 1;
+    while(j < position && p != NULL)
     {
-        q = p;
-        p = p->next;
+        p = p->getNext();
         j++;
     }
     if(j!=position)
         return error;
-    node->next = q->next->next;
-    q->next = node;
+    p->setData(data);
+    p = NULL;
     return ok;
 }
 
-
 //移除某个节点
 template <typename T>
-bool List<T>::remove(T *node, int position)
+bool List<T>::remove(int position)
 {
     if(position < 1 || position > this->length)
         return error;
 
-    T *p = this->head;
-    int j=0;
-    while(j<position-1 && p->next != NULL)
+    Node<T> *p = this->head, *v;
+    if(position == 1)
     {
-        p = p->next;
-        j++;
+        v = this->head;
+        this->head = v->getNext();
     }
-    if(j != position -1 || p->next == NULL)
-        return error;
-    node = p->next;
-    p->next = p->next->next;
+    else
+    {
+        int j=1;
+        while(j<position-1 && p != NULL)
+        {
+            p = p->getNext();
+            j++;
+        }
+        if(j != position -1 || p->getNext() == NULL)
+            return error;
+
+        v = p->getNext();
+        p->setNext(p->getNext()->getNext());
+    }
+
+    delete v;
+    p = v = NULL;
     this->length--;
     return ok;
 }
@@ -161,31 +256,32 @@ bool List<T>::remove(T *node, int position)
 template <typename T>
 void List<T>::reserve()
 {
-    T *top, *p, *j;
+    Node<T> *top, *p, *j;
     top = NULL;
-    p = head->next;
+    p = this->head;
     while(p != NULL)
     {
-        j = p->next;
-        p->next = top;
+        j = p->getNext();
+        p->setNext(top);
         top = p;
         p = j;
     }
-    head->next = top;
+    this->head = top;
+    top = p = j = NULL;
 }
 
 
 template <typename T>
-bool List<T>::contains(T *node)
+bool List<T>::contains(T data)
 {
-    T *p = head;
-    while(p->next != NULL)
+    Node<T> *p = this->head;
+    while(p != NULL)
     {
-        p = p->next;
-        if(p == node)
+        if(p->getData() == data)
         {
             return ok;
         }
+        p = p->getNext();
     }
     return error;
 }
@@ -201,28 +297,30 @@ int List<T>::size()
 template <typename T>
 void List<T>::print()
 {
-    T *p = this->head;
+    Node<T> *p = this->head;
     std::cout<<"debug: length="<<this->length<<std::endl;
-    while(p->next != NULL)
+    while(p != NULL)
     {
-        p=p->next;
-        std::cout<< p->data <<" ";
+        std::cout<< p->getData() <<" ";
+                p=p->getNext();
+
     }
     std::cout<<std::endl;
 }
-template <typename T>
-void List<T>::print_tree()
-{
-    T *p = this->head;
-    if(p == NULL)
-    {
-        return ;
-    }
-    std::cout<<"debug: length="<<this->length<<std::endl;
-    while(p->next != NULL)
-    {
-        p=p->next;
-        std::cout<<p->child->data<<" ";
-    }
-    std::cout<<std::endl;
+// template <typename T>
+// void List<T>::print_tree()
+// {
+//     Node<T> *p = this->head;
+//     if(p == NULL)
+//     {
+//         return ;
+//     }
+//     std::cout<<"debug: length="<<this->length<<std::endl;
+//     while(p != NULL)
+//     {
+//         p=p->getNext();
+//         // std::cout<<p->child->data<<" ";
+//     }
+//     std::cout<<std::endl;
+// }
 }
