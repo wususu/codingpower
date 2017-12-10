@@ -2,7 +2,7 @@
 #include "linkedlist.h"
 #include <iostream>
 
-namespace NT{
+namespace nt{
 
 
 template <typename T>

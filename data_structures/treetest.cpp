@@ -4,70 +4,52 @@
 int main()
 {
 
-    NT::TreeNode *tnode1 = new NT::TreeNode(1);
+    nt::Tree<std::string> *tree = new nt::Tree<std::string>();
+
+    tree->insert("A", "");
+
+    tree->insert("B","A");
+    tree->insert("C","A");
+    tree->insert("D","A");
+
+    tree->insert("E", "C");
+    tree->insert("F", "C");
+    tree->insert("H", "C");
 
 
-    NT::TreeNode *tnode2 = new NT::TreeNode(2);
-    NT::TreeNode *tnode3 = new NT::TreeNode(3);
+    std::cout<<tree->remove("C")<<std::endl;
+    std::cout<<tree->change("X", "F")<<std::endl;
+
+    std::cout<<"----"<<std::endl;
 
 
-
-    NT::TreeNode *tnode4 = new NT::TreeNode(5);
-    NT::TreeNode *tnode5 = new NT::TreeNode(6);
-    NT::TreeNode *tnode6 = new NT::TreeNode(7);
-    
-    NT::TreeNode *tnode7 = new NT::TreeNode(8);
-    NT::TreeNode *tnode8 = new NT::TreeNode(9);
-    NT::TreeNode *tnode9 = new NT::TreeNode(10);
-    
-    NT::TreeNode *tnode10 = new  NT::TreeNode(11);
-    NT::TreeNode *tnode11 = new  NT::TreeNode(12);
-    NT::TreeNode *tnode12 = new  NT::TreeNode(13);
-    NT::TreeNode *tnode13 = new  NT::TreeNode(14);
-
-    NT::TreeNode *tnode14 = new  NT::TreeNode(15);
-
-    
-    NT::Tree *tree = new NT::Tree();
-
-    tree->insert(tnode1, NULL);
-
-    tree->insert(tnode2, tnode1);
-    tree->insert(tnode3, tnode1);
-
-
-    tree->insert(tnode3, tnode1);
-
-    tree->insert(tnode4, tnode3);
-    tree->insert(tnode5, tnode4);
-    tree->insert(tnode6, tnode5);
-
-    tree->insert(tnode7, tnode2);
-    tree->insert(tnode13, tnode3);
-
-    tree->insert(tnode8, tnode7);
-    tree->insert(tnode9, tnode8);
-
-    tree->insert(tnode10, tnode9);
-    tree->insert(tnode11, tnode9);
-    tree->insert(tnode12, tnode9);
+    std::cout<<"树的深度是: "<<tree->depth()<<std::endl;
+    std::cout<<"----"<<std::endl;
 
     tree->print();
 
-    tree->change(tnode14,tnode9, 2);
-    std::cout<<tree->depth()<<std::endl;
-    tree->print();
+    std::cout<<"---------二叉树--------"<<std::endl;
+    bt::BinaryTree<int> btree;
+    std::cout<<"插入12: 成功?"<<btree.insert(12, 0, 0)<<std::endl;
+    std::cout<<"插入11: 成功?"<<btree.insert(11,12,0)<<std::endl;
+    std::cout<<"插入10: 成功?"<<btree.insert(10,12,1)<<std::endl;
 
-    BT::BinaryTree *binaryTree = new BT::BinaryTree();
 
-    BT::BinaryTree *binaryTree2 = binaryTree->toBinaryTree(tree);
+    std::cout<<"插入8: 成功?"<<btree.insert(8,11,0)<<std::endl;
+    std::cout<<"插入7: 成功?"<<btree.insert(7,11,1)<<std::endl;
 
-    std::cout<<"前序遍历二叉树"<<std::endl;
-    binaryTree->firstRootReserve(binaryTree2->root);
-    
-    std::cout<<"哈弗曼树构建及其遍历"<<std::endl;
-    binaryTree->printHaffumanTree(binaryTree2->toHaffumanTree());
-    
+    std::cout<<"插入9: 成功?"<<btree.insert(9,10,1)<<std::endl;
+    std::cout<<"插入6: 成功?"<<btree.insert(6,10,0)<<std::endl;
 
-    return 0;
+    btree.print();
+    bt::BinaryTree<int> *bbtree = btree.toHaffumanTree(); 
+
+    std::cout<<"哈夫曼编码: "<<std::endl;
+    btree.printHaffumanTree(bbtree);
+
+
+    std::cout<<"普通树转二叉树: "<<std::endl;
+    bt::BinaryTree<std::string> s_btree; 
+    bt::BinaryTree<std::string> *s_btree2 = s_btree.toBinaryTree(tree);
+    s_btree2->print();
 }

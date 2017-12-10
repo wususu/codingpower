@@ -1,35 +1,27 @@
 // 二叉树 / 哈夫曼书 / 普通书转二叉树
 #include <iostream>
 #include <string>
+#include <typeinfo>
 #include "normaltree.h"
 
 
-namespace BT{
+namespace bt{
 
+template <typename T>
 class Node
 {
 private:
-    int data;
+    T data;
     Node *leftChild;
     Node *rightChild;
     Node *parent;
 
 public:
-    Node()
-    {
-        this->data = 0;
-        this->leftChild = NULL;
-        this->rightChild = NULL;
-        this->parent = NULL;
-    }
-    Node(int data, Node *P)
-    {
-        this->data = data;
-        this->leftChild = NULL;
-        this->rightChild = NULL;
-        this->parent = P;
-    }
-    Node(int data, Node *L, Node *R, Node *P)
+    Node(T data):Node(data, NULL, NULL, NULL){};
+    
+    Node(T data, Node *P):Node(data, P, NULL, NULL){};
+    
+    Node(T data, Node *P, Node *L, Node *R)
     {
         this->data = data;
         this->leftChild = L;
@@ -43,7 +35,7 @@ public:
         delete parent;
     }
 
-    int getD()
+    T getD()
     {
         return this->data;
     }
@@ -63,17 +55,17 @@ public:
         this->rightChild = R;
     }
 
-    Node* getLchild()
+    Node<T>* getLchild()
     {
         return this->leftChild;
     }
 
-    Node* getRchild()
+    Node<T>* getRchild()
     {
         return this->rightChild;
     }
 
-    bool equals(Node *node)
+    bool equals(Node<T> *node)
     {
         return this->data == node->data;
     }
@@ -81,15 +73,40 @@ public:
 };
 
 
+template <typename T>
 class BinaryTree
 {  
+private:
+    Node<T> *root;
+    // 前序遍历二叉树
+    void firstRootReserve(Node<T> *rootNode);
+    // 中序遍历二叉树
+    void midRootReserve(Node<T> *rootNode);
+    // 后序遍历二叉树
+    void lastRootReserve(Node<T> *rootNode);
+
+    Node<T>* getNode(T data);
+
+    Node<T>* find(T data, Node<T> *root);
+
+    void doBinaryTree(nt::TreeNode<T> * bNode, Node<T> * binaryNode);
+    
+    void qsort(Node<T> **nodeArr, int low, int hight);
+
+    void printHaffumanTree(Node<T> *rootNode, std::string n);
+
+    // 获取二叉树所有节点放入数组中,并计数(n)
+
+    Node<T>** getTreeNodes(int &n) ;
+
+    void getAllTreeNodes(Node<T> *root, Node<T> *nodeArr[10000], int &n);
+
 public:
-    Node *root = NULL;
     BinaryTree()
     {
-
+        this->root = NULL;
     }
-    BinaryTree(Node *root)
+    BinaryTree(Node<T> *root)
     {
         this->root = root;
     }
@@ -97,63 +114,35 @@ public:
     {
 
     }
-    bool insert(int data, Node *parent, int side);
-    bool find(Node *node, Node *root);
-    bool contains(Node *node);
-    bool remove(Node *parent, int side);
-    bool change(Node *parent, int side);
-
-    // 前序遍历二叉树
-    void firstRootReserve(Node *rootNode);
+    
+    bool insert(T data, T parent, int side);
+    
+    bool contains(T data);
+    
+    bool remove(T data);
+    
+    bool change(T new_v, T old_v);
+    
+    // 打印输出二叉树
+    void print();
 
     // 普通树转二叉树
-    BinaryTree* toBinaryTree(NT::Tree* tree);
+    BinaryTree<T>* toBinaryTree(nt::Tree<T>* tree);
 
     // 二叉树转哈夫曼树
-    BinaryTree* toHaffumanTree();
-    Node** getTreeNodes(int &n) ;
-    void getAllTreeNodes(Node *root, Node *nodeArr[10000], int &n);
-    void printHaffumanTree(Node *rootNode, std::string n);
-    void printHaffumanTree(BinaryTree *rootNode);
+    BinaryTree<T>* toHaffumanTree();
+    
+    void printHaffumanTree(BinaryTree<T> *rootNode);
 };
 
-// 构建二叉树
-void doBinaryTree(NT::TreeNode * bNode, BT::Node * binaryNode)
-{
-
-    std::cout<<binaryNode->getD()<<std::endl;
-    if(bNode->length == 0)
-    {
-        binaryNode->setLchild(NULL);
-        binaryNode->setRchild(NULL);
-    }
-    else
-    {
-        // 第一个子结点
-        NT::TreeNode *firstbChild = bNode->root->get(1)->child;
-        BT::Node *leftChild = new BT::Node(firstbChild->data, binaryNode);
-        binaryNode->setLchild(leftChild);
-        doBinaryTree(firstbChild, leftChild);
-
-        for(int i=2; i<=bNode->length; i++)
-        {
-            NT::TreeNode *child = bNode->root->get(i)->child;
-            BT::Node *rightChild = new BT::Node(child->data, binaryNode);
-            binaryNode->setRchild(rightChild);
-            doBinaryTree(child, rightChild);
-
-            binaryNode = binaryNode->getRchild();
-        }
-    }
-}
-
 // 快排
-void qsort(Node **nodeArr, int low, int hight)
+template <typename T>
+void BinaryTree<T>::qsort(Node<T> **nodeArr, int low, int hight)
 {
     int l = low, h = hight;
     if(l<h)
     {
-        Node *key = nodeArr[l];
+        Node<T> *key = nodeArr[l];
 
         while(l<h)
         {
@@ -170,63 +159,82 @@ void qsort(Node **nodeArr, int low, int hight)
         qsort(nodeArr, low, l-1);
         qsort(nodeArr, h+1, hight);
     }
-
-}
 }
 
-
-
-// template<typename T>
-bool BT::BinaryTree::contains(Node *node)
+template<typename T>
+bool BinaryTree<T>::contains(T data)
 {
-    return this->find(node, this->root);
-}
-
-// template <typename T>
-bool BT::BinaryTree::find(Node *node, Node *root)
-{
-    if(root == NULL)
-    {
-        return false;
-    }
-    if(root == node)
+    if(this->find(data, this->root) != NULL)
     {
         return true;
-    }
-    if(root->getLchild() != NULL)
-    {
-        return this->find(node, root->getLchild());
-    }
-    if(root->getRchild() != NULL)
-    {
-        return this->find(node, root->getRchild());
     }
     return false;
 }
 
-
-
-// template<typename T>
-bool BT::BinaryTree::insert(int data, Node *parent, int side)
+template <typename T>
+Node<T>* BinaryTree<T>::getNode(T data)
 {
-    if(this->root = NULL)
+    return this->find(data, this->root);
+}
+
+// 递归查找data是否存在于root子树中
+template <typename T>
+Node<T>* BinaryTree<T>::find(T data, Node<T> *root)
+{
+    Node<T> *p = NULL;
+    if(root->getD() == data)
     {
-        Node *node = new Node(data, NULL);
+        return root;
+    }
+    if(root->getLchild() != NULL)
+    {
+        p = this->find(data, root->getLchild());
+        if(p != NULL)
+        {
+            return p;
+        }
+    }
+    if(root->getRchild() != NULL)
+    {
+        p = this->find(data, root->getRchild());
+        if(p!=NULL)
+        {
+            return p;
+        }
+    }
+    return NULL;
+}
+
+
+
+template<typename T>
+bool BinaryTree<T>::insert(T data, T parent, int side)
+{
+
+    Node<T> *p = NULL;
+
+    if(this->root == NULL)
+    {
+        Node<T> *node = new Node<T>(data, NULL);
         this->root = node;
+        return true;
     }
     else
     {
-        if(this->contains(parent))
+        p = this->getNode(parent);
+
+        if(p != NULL && !this->contains(data))
         {
-            Node *node = new Node(data, parent);
+            Node<T> *node = new Node<T>(data, p);
             if(side == 0)
             {
-                parent->setLchild(node);
+                p->setLchild(node);
             }
             else
             {
-                parent->setRchild(node);
+                p->setRchild(node);
             }
+            return true;
         }
         else
         {
@@ -237,29 +245,67 @@ bool BT::BinaryTree::insert(int data, Node *parent, int side)
 
 
 // 普通树转二叉树
-BT::BinaryTree* BT::BinaryTree::toBinaryTree(NT::Tree *tree)
+template <typename T>
+BinaryTree<T>* BinaryTree<T>::toBinaryTree(nt::Tree<T> *tree)
 {
-    NT::TreeNode *bTreeRoot = tree->root;
-    if(bTreeRoot == NULL || !bTreeRoot->data)
+    nt::TreeNode<T> *bTreeRoot = tree->root;
+    if(bTreeRoot == NULL)
     {
         return NULL;
     }
 
-    std::cout<<bTreeRoot->data<<std::endl;
-    BT::Node *binaryNode = new BT::Node(bTreeRoot->data, NULL);
-    BT::Node *binaryNodeC = binaryNode;
+    Node<T> *binaryNode = new Node<T>(bTreeRoot->getData(), NULL);
+    Node<T> *binaryNodeC = binaryNode;
 
-    BT::doBinaryTree(bTreeRoot, binaryNode);
+    doBinaryTree(bTreeRoot, binaryNode);
 
-    return new BT::BinaryTree(binaryNodeC);
+    return new BinaryTree<T>(binaryNodeC);
+}
+
+// 构建二叉树
+template <typename T>
+void BinaryTree<T>::doBinaryTree(nt::TreeNode<T> * bNode, Node<T> * binaryNode)
+{
+
+    if(bNode->length == 0)
+    {
+        binaryNode->setLchild(NULL);
+        binaryNode->setRchild(NULL);
+    }
+    else
+    {
+        // 第一个子结点
+        nt::TreeNode<T> *firstbChild = bNode->getChild(1);
+        Node<T> *leftChild = new Node<T>(firstbChild->getData(), binaryNode);
+        binaryNode->setLchild(leftChild);
+        doBinaryTree(firstbChild, leftChild);
+
+        for(int i=2; i<=bNode->length; i++)
+        {
+            nt::TreeNode<T> *child = bNode->getChild(i);
+            Node<T> *rightChild = new Node<T>(child->getData(), binaryNode);
+            binaryNode->setRchild(rightChild);
+            doBinaryTree(child, rightChild);
+
+            binaryNode = binaryNode->getRchild();
+        }
+    }
 }
 
 // 二叉树转哈夫曼树
-BT::BinaryTree* BT::BinaryTree::toHaffumanTree()
+template <typename T>
+BinaryTree<T>* BinaryTree<T>::toHaffumanTree()
 {
+    if(this->root == NULL)
+    {
+        return NULL;
+    }
+    if(typeid(this->root->getD()) != typeid(1) && typeid(this->root->getD()) != typeid(1.1))
+    {
+        return NULL;
+    }
     int n = 0;
-    BT::Node **nodeArr = this->getTreeNodes(n);
-    std::cout<<std::endl<<n<<std::endl;
+    bt::Node<T> **nodeArr = this->getTreeNodes(n);
     // 初始化
     for(int i=0;i<n;i++)
     {
@@ -271,24 +317,25 @@ BT::BinaryTree* BT::BinaryTree::toHaffumanTree()
     // 哈夫曼树构建
     while(n>1)
     {
-        BT::qsort(nodeArr, 0,n-1);
+        this->qsort(nodeArr, 0,n-1);
          
-        BT::Node *newNode = new BT::Node(nodeArr[n-1]->getD() + nodeArr[n-2]->getD(), nodeArr[n-1], nodeArr[n-2], NULL);
+        Node<T> *newNode = new Node<T>(nodeArr[n-1]->getD() + nodeArr[n-2]->getD(), NULL, nodeArr[n-1], nodeArr[n-2]);
         nodeArr[n-1]->setParent(newNode);
         nodeArr[n-2]->setParent(newNode);
         nodeArr[n-2] = newNode;
         n--;
     }
 
-    return new BT::BinaryTree(nodeArr[0]);
+    return new BinaryTree<T>(nodeArr[0]);
 }
 
 // 获取所有结点及其数目n
-BT::Node** BT::BinaryTree::getTreeNodes(int &n)
+template <typename T>
+Node<T>** BinaryTree<T>::getTreeNodes(int &n)
 {
     if(this->root != NULL)
     {
-        BT::Node **nodeArr = new BT::Node*[10000];
+        Node<T> **nodeArr = new Node<T>*[10000];
         n = 0;
         this->getAllTreeNodes(this->root, nodeArr, n);
         return nodeArr;
@@ -297,7 +344,8 @@ BT::Node** BT::BinaryTree::getTreeNodes(int &n)
 }
 
 // 遍历所有结点存到nodeArr数组
-void BT::BinaryTree::getAllTreeNodes(BT::Node *root, BT::Node **nodeArr, int &n)
+template <typename T>
+void BinaryTree<T>::getAllTreeNodes(Node<T> *root, Node<T> **nodeArr, int &n)
 {
     nodeArr[n] = root;
     n++;
@@ -311,9 +359,21 @@ void BT::BinaryTree::getAllTreeNodes(BT::Node *root, BT::Node **nodeArr, int &n)
     }
 }
 
+template <typename T>
+void BinaryTree<T>::print()
+{
+    std::cout<<"前序遍历: ";
+    this->firstRootReserve(this->root);
+    std::cout<<std::endl<<"中序遍历: ";
+    this->midRootReserve(this->root);
+    std::cout<<std::endl<<"后序遍历: ";
+    this->lastRootReserve(this->root);
+    std::cout<<std::endl;
+}
 
 // 前序遍历
-void BT::BinaryTree::firstRootReserve(BT::Node *node)
+template <typename T>
+void BinaryTree<T>::firstRootReserve(Node<T> *node)
 {
     std::cout<<node->getD()<<" ";
     if(node->getLchild() != NULL)
@@ -326,9 +386,41 @@ void BT::BinaryTree::firstRootReserve(BT::Node *node)
     }
 }
 
+// 中序遍历
+template <typename T>
+void BinaryTree<T>::midRootReserve(Node<T> *node)
+{
+    if(node->getLchild() != NULL)
+    {
+        this->midRootReserve(node->getLchild());
+    }
+    std::cout<<node->getD()<<" ";
+    if(node->getRchild() != NULL)
+    {
+        this->midRootReserve(node->getRchild());
+    }
+}
+
+// 后序遍历
+template <typename T>
+void BinaryTree<T>::lastRootReserve(Node<T> *node)
+{
+    if(node->getLchild() != NULL)
+    {
+        this->lastRootReserve(node->getLchild());
+    }
+    std::cout<<node->getD()<<" ";
+    if(node->getRchild() != NULL)
+    {
+        this->lastRootReserve(node->getRchild());
+    }
+}
+
+
 
 // 遍历输出哈夫曼树及其编码
-void BT::BinaryTree::printHaffumanTree(Node *rootNode, std::string s)
+template <typename T>
+void BinaryTree<T>::printHaffumanTree(Node<T> *rootNode, std::string s)
 {
     if(rootNode->getLchild() == NULL && rootNode->getRchild() == NULL)
     {
@@ -344,7 +436,10 @@ void BT::BinaryTree::printHaffumanTree(Node *rootNode, std::string s)
     }
 }
 
-void BT::BinaryTree::printHaffumanTree(BT::BinaryTree *tree)
+template <typename T>
+void BinaryTree<T>::printHaffumanTree(BinaryTree<T> *tree)
 {
     this->printHaffumanTree(tree->root, "");
+    std::cout<<std::endl;
+}
 }
