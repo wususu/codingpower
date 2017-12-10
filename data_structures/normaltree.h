@@ -10,12 +10,16 @@ class TreeNode
 {
 private:
 
-    
-public:
-    int length;
     T data;
+    
     TreeNode *parent;
+    
     ll::List<TreeNode<T>*> *child_list = new ll::List<TreeNode<T>*>;
+
+public:
+
+    int length;
+
     TreeNode(T data)
     {
         this->data = data;
@@ -115,60 +119,75 @@ template <typename T>
 class Tree
 {
  
-public:
-    TreeNode<T> *root;
+private:
+        // 通过data获取该节点
+    TreeNode<T>* getNode(T data);
 
-    enum {error = 0, ok = 1};
-    Tree()
-    {
-        this->root = NULL; 
-    }
-    ~Tree()
-    {
-    }
-    bool insert(T data,T parent);
+    TreeNode<T>* getNode(TreeNode<T> *node,  T data);
 
     bool c_dfs(TreeNode<T> *node, T data);
 
     int d_dfs(TreeNode<T> *node);
 
+    void print2(TreeNode<T> *node,int i);
+public:
+    TreeNode<T> *root;
+
+    enum {error = 0, ok = 1};
+    Tree();
+
+    ~Tree();
+
+    //插入
+    bool insert(T data,T parent);
+
+    //深度
     int depth();
 
-    void print();
-
-    void print2(TreeNode<T> *node,int i);
-
-    // 通过data获取该节点
-    TreeNode<T>* getNode(T data)
-    {
-        return this->getNode(this->root, data);
-    }
-
-    TreeNode<T>* getNode(TreeNode<T> *node,  T data)
-    {
-        TreeNode<T> *p = NULL;
-        if(node->getData() == data)
-        {
-            return node;
-        }
-        for(int i=1; i<=node->length && p==NULL; i++)
-        {
-            p = this->getNode(node->getChild(i), data);
-        }
-        return p;
-    }
-
-    bool contains(T data)
-    {
-        return this->c_dfs(this->root, data);
-    }
+    bool contains(T data);
+    
+    //移除
     bool remove(T data);
+    
+    //修改
     bool change(T new_v, T old_v);
-    // int depth();
-    // int dfs(TreeNode<T> *tnode);
-    // void print();
-    // void print2(TreeNode<T> *node, int i);
+    
+    //打印当前所有节点
+    void print();
 };
+
+template <typename T>
+Tree<T>::Tree()
+{
+    this->root = NULL; 
+}
+
+template <typename T>
+Tree<T>::~Tree()
+{
+
+}
+
+template <typename T>
+TreeNode<T>* Tree<T>::getNode(T data)
+{
+    return this->getNode(this->root, data);
+}
+
+template <typename T>
+TreeNode<T>* Tree<T>::getNode(TreeNode<T> *node,  T data)
+{
+    TreeNode<T> *p = NULL;
+    if(node->getData() == data)
+    {
+        return node;
+    }
+    for(int i=1; i<=node->length && p==NULL; i++)
+    {
+        p = this->getNode(node->getChild(i), data);
+    }
+    return p;
+}
 
 template<typename T>
 bool Tree<T>::remove(T data)
@@ -196,6 +215,11 @@ bool Tree<T>::remove(T data)
     return false;
 }
 
+template <typename T>
+bool Tree<T>::contains(T data)
+{
+    return this->c_dfs(this->root, data);
+}
 
 template<typename T>
 bool Tree<T>::insert(T data, T parent)
@@ -284,7 +308,7 @@ void Tree<T>::print()
 {
     TreeNode<T> *p = this->root;
     std::cout<<"第一层:"<<std::endl;
-    std::cout<<this->root->data<<std::endl;
+    std::cout<<this->root->getData()<<std::endl;
     if(p!=NULL)
         this->print2(p,2);
 }
