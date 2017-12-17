@@ -75,6 +75,8 @@ class List
         bool insert(T data, int position = -1);
         
         bool remove(int position);
+
+        bool remove(T data);
         
         bool change(T data, int position);
         

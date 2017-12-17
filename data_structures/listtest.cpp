@@ -8,8 +8,11 @@ using namespace ll;
 int main()
 {
 
-    List<std::string> list;
+    List<std::string> *list = new List<std::string>();
     list.insert("janke");
+
+    
+
     list.insert("hehe");
     list.insert("华山");
 

@@ -13,7 +13,7 @@ int main()
 
     int h[n+1];
     for(int i=0; i<n; i++)
-    {
+    {/
         cin>>h[i];
     }
     qsort(h,n, sizeof(h[0]), cmp);

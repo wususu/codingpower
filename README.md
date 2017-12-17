@@ -1,2 +1,3 @@
-# LeetCode
-Algorithms Pracitce
+# 码！码！码！
+
+快码加鞭，提高码力
