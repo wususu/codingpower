@@ -1,16 +1,14 @@
 package rebuildbinarytree;
 
-import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.sun.org.apache.regexp.internal.recompile;
-
-import junit.framework.Assert;
 
 public class SolutionTest {
 
