@@ -13,6 +13,8 @@ public class SolutionTest {
 		Assert.assertEquals(1, solution.minNumberInRotateArray(new int[]{4,5,6,7,7,7,1,1,2,3}));
 		Assert.assertEquals(3, solution.minNumberInRotateArray(new int[]{4,5,6,7,7,3}));
 		Assert.assertEquals(4, solution.minNumberInRotateArray(new int[]{4}));
+		Assert.assertEquals(1, solution.minNumberInRotateArray(new int[]{1,2,3,4,5,6}));
+		Assert.assertEquals(2, solution.minNumberInRotateArray(new int[]{3,4,5,6,2,3}));
 
 	}
 
