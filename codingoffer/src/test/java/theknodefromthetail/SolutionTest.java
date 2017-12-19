@@ -16,9 +16,9 @@ public class SolutionTest {
 		head.next.next.next.next.next = new ListNode(6);
 	}
 	
-	@Test(expected=RuntimeException.class)
+	@Test
 	public void test() {
-		so.FindKthToTail(head, 7);
+		Assert.assertEquals(null, so.FindKthToTail(head, 7));
 	}
 	
 	@Test
