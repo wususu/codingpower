@@ -8,8 +8,6 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.sun.org.apache.regexp.internal.recompile;
-
 public class SolutionTest {
 
 	private Solution so = new Solution();
