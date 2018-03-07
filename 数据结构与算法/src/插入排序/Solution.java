@@ -1,3 +1,4 @@
+// 将一个元素插入到已排序的数组中，使得插入之后的数组也是有序的。
 package 插入排序;
 
 import java.util.Arrays;
